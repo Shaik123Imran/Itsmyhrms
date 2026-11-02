@@ -4,19 +4,19 @@ const MOCK_USERS = [
   {
     email: 'ceo@itshrms.com',
     password: 'password',
-    role: 'CEO',
+    role: 'Super Admin',
     name: 'Aarav Mehta',
   },
   {
     email: 'hr@itshrms.com',
     password: 'password',
-    role: 'HR Head',
+    role: 'HR',
     name: 'Priya Sharma',
   },
   {
     email: 'pm@itshrms.com',
     password: 'password',
-    role: 'Project Manager',
+    role: 'Manager',
     name: 'Rohan Verma',
   },
   {
@@ -24,6 +24,24 @@ const MOCK_USERS = [
     password: 'password',
     role: 'Employee',
     name: 'Neha Kapoor',
+  },
+  {
+    email: 'finance@itshrms.com',
+    password: 'password',
+    role: 'Finance',
+    name: 'Meera Iyer',
+  },
+  {
+    email: 'sales@itshrms.com',
+    password: 'password',
+    role: 'Sales & Marketing',
+    name: 'Arjun Nair',
+  },
+  {
+    email: 'client@itshrms.com',
+    password: 'password',
+    role: 'Client',
+    name: 'Kiran Shah',
   },
 ]
 

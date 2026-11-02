@@ -4,10 +4,13 @@ import { AlertCircle, Building2, Lock, LogIn, Mail } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 const MOCK_CREDENTIALS = [
-  { role: 'CEO', email: 'ceo@itshrms.com' },
-  { role: 'HR Head', email: 'hr@itshrms.com' },
-  { role: 'Project Manager', email: 'pm@itshrms.com' },
+  { role: 'Super Admin', email: 'ceo@itshrms.com' },
+  { role: 'HR', email: 'hr@itshrms.com' },
+  { role: 'Manager', email: 'pm@itshrms.com' },
   { role: 'Employee', email: 'emp@itshrms.com' },
+  { role: 'Finance', email: 'finance@itshrms.com' },
+  { role: 'Sales & Marketing', email: 'sales@itshrms.com' },
+  { role: 'Client', email: 'client@itshrms.com' },
 ]
 
 export default function Login() {

@@ -18,7 +18,7 @@ import {
   StatusBadge,
 } from '../components/dashboard/ui'
 import { useAuth } from '../contexts/AuthContext'
-import { getRoleKey } from '../config/roles'
+import { getRoleKey, isOrgWideRole } from '../config/roles'
 import { useWorkspaceCollection } from '../hooks/useWorkspaceCollection'
 import {
   STORAGE_KEYS,
@@ -58,6 +58,7 @@ export default function Timesheets() {
 
   const roleKey = getRoleKey(user?.role)
   const isOrgRole = roleKey === 'admin' || roleKey === 'hr'
+  const isOrgWide = isOrgWideRole(roleKey)
   const isManager = roleKey === 'manager'
   const isEmployee = roleKey === 'employee'
   const currentEmployee = getCurrentEmployee(user, employees)
@@ -70,7 +71,7 @@ export default function Timesheets() {
   )
 
   const visibleIds = useMemo(() => {
-    if (isOrgRole) return new Set(employees.map((employee) => employee.id))
+    if (isOrgWide) return new Set(employees.map((employee) => employee.id))
     if (isManager) {
       return new Set(
         [currentEmployee?.id, ...teamMembers.map((employee) => employee.id)]
@@ -78,7 +79,7 @@ export default function Timesheets() {
       )
     }
     return new Set(currentEmployee ? [currentEmployee.id] : [])
-  }, [isOrgRole, isManager, employees, currentEmployee, teamMembers])
+  }, [isOrgWide, isManager, employees, currentEmployee, teamMembers])
 
   const visibleEntries = useMemo(
     () =>
@@ -237,7 +238,7 @@ export default function Timesheets() {
   ).length
 
   const detailEntry = entries.find((entry) => entry.id === detailId)
-  const scopeLabel = isOrgRole
+  const scopeLabel = isOrgWide
     ? 'Organisation-wide'
     : isManager
       ? 'Your team'

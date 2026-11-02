@@ -18,7 +18,7 @@ import {
   StatusBadge,
 } from '../components/dashboard/ui'
 import { useAuth } from '../contexts/AuthContext'
-import { getRoleKey } from '../config/roles'
+import { getRoleKey, isOrgWideRole } from '../config/roles'
 import { useWorkspaceCollection } from '../hooks/useWorkspaceCollection'
 import {
   STORAGE_KEYS,
@@ -63,7 +63,9 @@ export default function Projects() {
 
   const roleKey = getRoleKey(user?.role)
   const isOrgRole = roleKey === 'admin' || roleKey === 'hr'
+  const isOrgWide = isOrgWideRole(roleKey)
   const isManager = roleKey === 'manager'
+  const canCreate = isOrgRole || isManager
   const currentEmployee = getCurrentEmployee(user, employees)
   const teamMembers = useMemo(
     () =>
@@ -74,7 +76,7 @@ export default function Projects() {
   )
 
   const visibleProjects = useMemo(() => {
-    if (isOrgRole) return projects
+    if (isOrgWide) return projects
     if (isManager) {
       const initials = new Set(
         [currentEmployee, ...teamMembers]
@@ -90,17 +92,17 @@ export default function Projects() {
           (project.team ?? []).includes(getInitials(currentEmployee.name)),
         )
       : []
-  }, [projects, isOrgRole, isManager, currentEmployee, teamMembers])
+  }, [projects, isOrgWide, isManager, currentEmployee, teamMembers])
 
   useEffect(() => {
-    if (searchParams.get('action') === 'new') {
+    if (canCreate && searchParams.get('action') === 'new') {
       setForm(EMPTY_FORM)
       setIsModalOpen(true)
       const next = new URLSearchParams(searchParams)
       next.delete('action')
       setSearchParams(next, { replace: true })
     }
-  }, [searchParams, setSearchParams])
+  }, [canCreate, searchParams, setSearchParams])
 
   const closeModal = () => {
     setIsModalOpen(false)
@@ -178,11 +180,14 @@ export default function Projects() {
     (project) => project.status === 'Completed',
   ).length
 
-  const scopeLabel = isOrgRole
-    ? 'Organisation portfolio'
-    : isManager
-      ? 'Your team portfolio'
-      : 'Your projects'
+  const scopeLabel =
+    roleKey === 'client'
+      ? 'Client portfolio'
+      : isOrgWide
+        ? 'Organisation portfolio'
+        : isManager
+          ? 'Your team portfolio'
+          : 'Your projects'
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -200,17 +205,19 @@ export default function Projects() {
             {scopeLabel} · delivery health and progress.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setForm(EMPTY_FORM)
-            setIsModalOpen(true)
-          }}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          <Plus className="h-4 w-4" />
-          New project
-        </button>
+        {canCreate ? (
+          <button
+            type="button"
+            onClick={() => {
+              setForm(EMPTY_FORM)
+              setIsModalOpen(true)
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            <Plus className="h-4 w-4" />
+            New project
+          </button>
+        ) : null}
       </div>
 
       {notice ? (
@@ -299,15 +306,21 @@ export default function Projects() {
             <EmptyState
               icon={FolderKanban}
               title="No projects found"
-              description="Try a different status or search, or create a new project."
+              description={
+                canCreate
+                  ? 'Try a different status or search, or create a new project.'
+                  : 'Try a different status or search.'
+              }
               action={
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(true)}
-                  className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
-                >
-                  Create project
-                </button>
+                canCreate ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-700"
+                  >
+                    Create project
+                  </button>
+                ) : null
               }
             />
           ) : (
@@ -373,12 +386,13 @@ export default function Projects() {
         </div>
       </div>
 
-      <Modal
-        open={isModalOpen}
-        onClose={closeModal}
-        title="New project"
-        description="Create a project and start tracking delivery."
-      >
+      {canCreate ? (
+        <Modal
+          open={isModalOpen}
+          onClose={closeModal}
+          title="New project"
+          description="Create a project and start tracking delivery."
+        >
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label
@@ -473,7 +487,8 @@ export default function Projects() {
             </button>
           </div>
         </form>
-      </Modal>
+        </Modal>
+      ) : null}
     </div>
   )
 }

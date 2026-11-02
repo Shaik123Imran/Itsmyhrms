@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { ROUTE_ACCESS } from './config/navigation'
+import { getRoleKey } from './config/roles'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import MainLayout from './layouts/MainLayout'
 import Attendance from './pages/Attendance'
@@ -32,7 +33,7 @@ function RoleRoute({ module, children }) {
 
   const allowedRoles = ROUTE_ACCESS[module] ?? []
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(getRoleKey(user.role))) {
     return <Navigate to="/" replace />
   }
 

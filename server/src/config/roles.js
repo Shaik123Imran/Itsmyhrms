@@ -1,0 +1,45 @@
+export const ROLES = Object.freeze({
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  HR: 'HR',
+  MANAGER: 'MANAGER',
+  EMPLOYEE: 'EMPLOYEE',
+  FINANCE: 'FINANCE',
+  SALES_MARKETING: 'SALES_MARKETING',
+  CLIENT: 'CLIENT',
+});
+
+export const ROLE_VALUES = Object.freeze(Object.values(ROLES));
+
+export const PEOPLE_ADMIN_ROLES = Object.freeze([
+  ROLES.SUPER_ADMIN,
+  ROLES.HR,
+]);
+
+export const PEOPLE_READ_ROLES = Object.freeze([
+  ROLES.SUPER_ADMIN,
+  ROLES.HR,
+  ROLES.MANAGER,
+]);
+
+export const APPROVER_ROLES = Object.freeze([
+  ROLES.SUPER_ADMIN,
+  ROLES.HR,
+  ROLES.MANAGER,
+]);
+
+export const LEAVE_READ_ROLES = Object.freeze([
+  ROLES.SUPER_ADMIN,
+  ROLES.HR,
+  ROLES.MANAGER,
+  ROLES.FINANCE,
+  ROLES.SALES_MARKETING,
+]);
+
+export const SELF_SERVICE_ROLES = Object.freeze([
+  ROLES.SUPER_ADMIN,
+  ROLES.HR,
+  ROLES.MANAGER,
+  ROLES.EMPLOYEE,
+  ROLES.FINANCE,
+  ROLES.SALES_MARKETING,
+]);

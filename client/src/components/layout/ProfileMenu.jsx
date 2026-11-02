@@ -9,7 +9,7 @@ import {
   LogOut,
   Mail,
 } from 'lucide-react'
-import { roleBadgeClass } from '../../config/roles'
+import { getRoleLabel, roleBadgeClass } from '../../config/roles'
 import { useAuth } from '../../contexts/AuthContext'
 import { Avatar } from '../dashboard/ui'
 
@@ -83,7 +83,7 @@ export function ProfileMenu() {
             {user.name}
           </span>
           <span className="block text-[10px] font-medium text-slate-500">
-            {user.role}
+            {getRoleLabel(user.role)}
           </span>
         </span>
         <ChevronDown className="hidden h-3.5 w-3.5 text-slate-400 sm:block" />
@@ -108,7 +108,7 @@ export function ProfileMenu() {
                 user.role,
               )}`}
             >
-              {user.role}
+              {getRoleLabel(user.role)}
             </span>
           </div>
 

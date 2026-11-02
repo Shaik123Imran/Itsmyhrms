@@ -2,6 +2,7 @@ import {
   canApproveForRole,
   getRoleKey,
   getRoleLabel,
+  isOrgWideRole,
 } from '../config/roles'
 import {
   addDays,
@@ -84,9 +85,9 @@ function resolveScope(user, employees) {
   let visibleEmployees = []
   let scopeLabel = 'My workspace'
 
-  if (roleKey === 'admin' || roleKey === 'hr') {
+  if (isOrgWideRole(roleKey)) {
     visibleEmployees = employees
-    scopeLabel = 'Organization'
+    scopeLabel = roleKey === 'client' ? 'Client portfolio' : 'Organization'
   } else if (roleKey === 'manager') {
     visibleEmployees = currentEmployee
       ? getTeamMembers(currentEmployee.id, employees)
@@ -104,12 +105,12 @@ function resolveScope(user, employees) {
     visibleEmployees,
     scopeIds: visibleEmployees.map((employee) => employee.id),
     scopeLabel,
-    isOrgWide: roleKey === 'admin' || roleKey === 'hr',
+    isOrgWide: isOrgWideRole(roleKey),
   }
 }
 
 function getProjectScopeInitials(scope) {
-  if (scope.roleKey === 'admin' || scope.roleKey === 'hr') {
+  if (isOrgWideRole(scope.roleKey)) {
     return null
   }
 
@@ -730,7 +731,7 @@ function filterNotifications(notifications, user, scope) {
 }
 
 function filterActivity(activity, scope) {
-  if (scope.roleKey === 'admin' || scope.roleKey === 'hr') {
+  if (isOrgWideRole(scope.roleKey) && scope.roleKey !== 'client') {
     return activity
   }
 
@@ -1135,11 +1136,10 @@ export function buildDashboardData(user, options = {}) {
     departments: unique(
       scope.visibleEmployees.map((employee) => employee.department),
     ).length,
-    branches:
-      scope.roleKey === 'admin' || scope.roleKey === 'hr'
-        ? branches.length
-        : unique(scope.visibleEmployees.map((employee) => employee.branch))
-            .length,
+    branches: isOrgWideRole(scope.roleKey)
+      ? branches.length
+      : unique(scope.visibleEmployees.map((employee) => employee.branch))
+          .length,
     newJoiners: newJoiners.length,
     exits: exits.length,
     attendance: attendanceSummary,

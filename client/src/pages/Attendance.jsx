@@ -17,7 +17,7 @@ import {
   StatusBadge,
 } from '../components/dashboard/ui'
 import { useAuth } from '../contexts/AuthContext'
-import { getRoleKey } from '../config/roles'
+import { getRoleKey, isOrgWideRole } from '../config/roles'
 import { useWorkspaceCollection } from '../hooks/useWorkspaceCollection'
 import {
   STORAGE_KEYS,
@@ -67,16 +67,16 @@ export default function Attendance() {
   }, [])
 
   const roleKey = getRoleKey(user?.role)
-  const isOrgRole = roleKey === 'admin' || roleKey === 'hr'
+  const isOrgWide = isOrgWideRole(roleKey)
   const isManager = roleKey === 'manager'
   const isEmployee = roleKey === 'employee'
   const currentEmployee = getCurrentEmployee(user, employees)
 
   const visibleEmployees = useMemo(() => {
-    if (isOrgRole) return employees
+    if (isOrgWide) return employees
     if (isManager) return getTeamMembers(currentEmployee?.id, employees)
     return currentEmployee ? [currentEmployee] : []
-  }, [employees, isOrgRole, isManager, currentEmployee])
+  }, [employees, isOrgWide, isManager, currentEmployee])
 
   const todayISO = toISODate()
   const myToday = attendance.find(
@@ -242,7 +242,7 @@ export default function Attendance() {
     year: 'numeric',
   })
 
-  const scopeLabel = isOrgRole
+  const scopeLabel = isOrgWide
     ? 'Organisation-wide'
     : isManager
       ? 'Your team'

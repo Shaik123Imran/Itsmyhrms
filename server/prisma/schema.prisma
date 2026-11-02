@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      String    @default("EMPLOYEE")
+  employee  Employee?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Employee {
+  id           Int          @id @default(autoincrement())
+  userId       Int          @unique
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeCode String?      @unique
+  department   String?
+  designation  String?
+  status       String       @default("Active")
+  managerId    Int?
+  manager      Employee?    @relation("EmployeeManager", fields: [managerId], references: [id])
+  reports      Employee[]   @relation("EmployeeManager")
+  branch       String?
+  workMode     String?
+  joinedOn     DateTime?
+  attendance   Attendance[]
+  leaves       Leave[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Attendance {
+  id         Int       @id @default(autoincrement())
+  employeeId Int
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  date       DateTime
+  checkIn    DateTime?
+  checkOut   DateTime?
+  status     String    @default("Present")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([employeeId, date])
+  @@index([employeeId])
+}
+
+model Leave {
+  id         Int       @id @default(autoincrement())
+  employeeId Int
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  type       String
+  startDate  DateTime
+  endDate    DateTime
+  days       Int?
+  status     String    @default("Pending")
+  reason     String?
+  appliedOn  DateTime  @default(now())
+  reviewedOn DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+}
